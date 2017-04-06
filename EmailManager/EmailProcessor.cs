@@ -14,12 +14,19 @@ namespace EmailManager
 		public static bool ProcessEmail(string headerPath, string bodyPath, string filename) {
 
 			EmailHeader emailHeader = GetHeader(headerPath, filename);
-			
+
+			var headerString = FileManager.FileToString(headerPath, filename);
+			var bodyString = FileManager.FileToString(bodyPath, filename);
+
 			//Get emails from header
-			List<string> headerEmailsList = ExtractEmails(FileManager.FileToString(headerPath, filename));
+			List<string> headerEmailsList   = ExtractEmails(headerString);
 			
 			//Get emails from body
-			List<string> bodyEmailList = ExtractEmails(FileManager.FileToString(bodyPath, filename));
+			List<string> bodyEmailList		= ExtractEmails(bodyString);
+
+			List<string> headerHttpDomainList = ExtractHttpDomains(headerString);
+
+			List<string> bodyHttpDomainList = ExtractHttpDomains(bodyString);
 
 			List<string> headerDomainList = ExtractDomains(headerEmailsList);
 
@@ -101,27 +108,20 @@ namespace EmailManager
 			return domainList;
 		}
 
-		//private static List<string> emas(string text)
-		//{
-		//	const string MatchEmailPattern =
-		//   @"(([\w-]+\.)+[\w-]+|([a-zA-Z]{1}|[\w-]{2,}))@"
-		//   + @"((([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\.([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\."
-		//	 + @"([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])\.([0-1]?[0-9]{1,2}|25[0-5]|2[0-4][0-9])){1}|"
-		//   + @"([a-zA-Z]+[\w-]+\.)+[a-zA-Z]{2,4})";
-		//	Regex rx = new Regex(MatchEmailPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-		//	// Find matches.
-		//	MatchCollection matches = rx.Matches(text);
-		//	// Report the number of matches found.
-		//	int noOfMatches = matches.Count;
-		//	// Report on each match.
-		//	List<string> results = new List<string>();
+			public static List<string> ExtractHttpDomains(string textToScrape)
+		{
+			Regex reg = new Regex(@"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?", RegexOptions.IgnoreCase);
+			Match match;
 
-		//	foreach (Match match in matches)
-		//	{
-		//		results.Add(match.Value);
-		//		Console.WriteLine(match.Value.ToString());
-		//	}
-		//	return results;
-		//}
+			List<string> results = new List<string>();
+			for (match = reg.Match(textToScrape); match.Success; match = match.NextMatch())
+			{
+				if (!(results.Contains(match.Value)))
+					results.Add(match.Value);
+
+				Console.WriteLine(match.Value.ToString());
+			}
+			return results;
+		}
 	}
 }
