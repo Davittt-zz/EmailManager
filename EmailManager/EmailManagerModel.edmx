@@ -30,7 +30,6 @@
           <Property Name="Account" Type="varchar" MaxLength="80" />
           <Property Name="Server" Type="varchar" MaxLength="80" />
           <Property Name="SenderEmailID" Type="int" />
-          <Property Name="TimeAcquired" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
           <Property Name="ClientIP" Type="varchar" MaxLength="64" />
           <Property Name="AuthenticationStatus" Type="int" />
           <Property Name="User" Type="varchar" MaxLength="80" />
@@ -41,6 +40,7 @@
           <Property Name="Subject" Type="nvarchar" MaxLength="200" />
           <Property Name="SupplementalTextFilename" Type="varchar" MaxLength="128" />
           <Property Name="DateAdded" Type="datetime" />
+          <Property Name="TimeAcquired" Type="nvarchar" MaxLength="50" StoreGeneratedPattern="Computed" />
         </EntityType>
         <EntityType Name="EmailRecipients">
           <Key>
@@ -175,7 +175,7 @@
           <Property Name="Account" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
           <Property Name="Server" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
           <Property Name="SenderEmailID" Type="Int32" />
-          <Property Name="TimeAcquired" Type="Binary" MaxLength="8" FixedLength="true" Nullable="false" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="TimeAcquired" Type="String" annotation:StoreGeneratedPattern="Computed" MaxLength="50" Unicode="true" FixedLength="false" />
           <Property Name="ClientIP" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
           <Property Name="AuthenticationStatus" Type="Int32" />
           <Property Name="User" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />

@@ -10,7 +10,7 @@
         <EntityTypeShape EntityType="QuarksoftDBEmailsModel.Emails" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
         <AssociationConnector Association="QuarksoftDBEmailsModel.FK_dbo_EmailHeader_dbo_Email_EmailID" ManuallyRouted="false" />
         <EntityTypeShape EntityType="QuarksoftDBEmailsModel.EmailDomains" Width="1.5" PointX="8" PointY="1.625" />
-        <EntityTypeShape EntityType="QuarksoftDBEmailsModel.EmailRecipients" Width="1.5" PointX="5.5" PointY="3.625" />
+        <EntityTypeShape EntityType="QuarksoftDBEmailsModel.EmailRecipients" Width="1.5" PointX="5.625" PointY="3.25" />
         <AssociationConnector Association="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_Domain_DomainID" />
         <AssociationConnector Association="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID" />
         <AssociationConnector Association="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID" />

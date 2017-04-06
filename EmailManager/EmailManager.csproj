@@ -43,6 +43,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,8 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="EmailProcessor.cs" />
+    <Compile Include="EmailsBO.cs" />
     <Compile Include="Domains.cs">
+      <DependentUpon>EmailManagerModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EmailDomains.cs">
       <DependentUpon>EmailManagerModel.tt</DependentUpon>
     </Compile>
     <Compile Include="EmailHeader.cs">
@@ -73,9 +78,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>EmailManagerModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="EmailRecipients.cs">
+      <DependentUpon>EmailManagerModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Emails.cs">
       <DependentUpon>EmailManagerModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="FileManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
