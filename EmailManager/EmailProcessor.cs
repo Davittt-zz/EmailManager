@@ -11,30 +11,65 @@ namespace EmailManager
 {
 	public class EmailProcessor
 	{
-		public static bool ProcessEmail(string headerPath, string bodyPath, string filename) {
-
+		public static bool ProcessEmail(string headerPath, string bodyPath, string filename)
+		{
 			EmailHeader emailHeader = GetHeader(headerPath, filename);
 
 			var headerString = FileManager.FileToString(headerPath, filename);
 			var bodyString = FileManager.FileToString(bodyPath, filename);
-
-			//Get emails from header
-			List<string> headerEmailsList   = ExtractEmails(headerString);
 			
-			//Get emails from body
-			List<string> bodyEmailList		= ExtractEmails(bodyString);
+			List<string> OverallEmailList = GetAllEmails(headerString, bodyString);
 
-			List<string> headerHttpDomainList = ExtractHttpDomains(headerString);
+			List<string> OverallDomainList = GetAllDomains(headerString, bodyString);
 
-			List<string> bodyHttpDomainList = ExtractHttpDomains(bodyString);
+			//Find EmailID or creat new elements
+			List<int> EmailIDList = UpdateEmailTable(OverallEmailList);
 
-			List<string> headerDomainList = ExtractDomains(headerEmailsList);
-
-			List<string> bodyDomainList = ExtractDomains(bodyEmailList);
-
+			//Find DomainID or creat new elements
+			List<int> DomainIDList = UpdateDomainTable(OverallDomainList);
 			return false;
 		}
-		
+
+		private static List<int> UpdateEmailTable(List<string> overallEmailList)
+		{
+			throw new NotImplementedException();
+		}
+
+		private static List<int> UpdateDomainTable(List<string> OverallDomainList)
+		{
+			throw new NotImplementedException();
+		}
+
+		private static List<string> GetAllDomains(string headerString, string bodyString)
+		{
+			//Get domains from header
+			List<string> headerEmailsList = ExtractEmails(headerString) ?? new List<string>();
+			//Get domains from body
+			List<string> bodyEmailList = ExtractEmails(bodyString);
+
+			List<string> FullList = ExtractDomains(headerEmailsList);
+			List<string> bodyDomainList = ExtractDomains(bodyEmailList);
+			//http,ftp,https domains
+			List<string> headerHttpDomainList = ExtractHttpDomains(headerString);
+			List<string> bodyHttpDomainList = ExtractHttpDomains(bodyString);
+
+			FullList.AddRange(bodyDomainList);
+			FullList.AddRange(headerHttpDomainList);
+			FullList.AddRange(bodyHttpDomainList);
+
+			return FullList.Distinct().ToList();
+		}
+
+		private static List<string> GetAllEmails(string headerString, string bodyString)
+		{
+			//Get emails from header
+			List<string> FullList = ExtractEmails(headerString);
+			//Get emails from body
+			List<string> bodyEmailList = ExtractEmails(bodyString);
+			FullList.AddRange(bodyEmailList);
+			return FullList.Distinct().ToList();
+		}
+
 		private static EmailHeader GetHeader(string headerPath, string filename)
 		{
 			//Read Header
@@ -49,37 +84,28 @@ namespace EmailManager
 			//Conver to EmailHeaderObject
 			EmailHeader emailHeader = (EmailHeader)(new JavaScriptSerializer())
 													.Deserialize(jsonEmailHeader, (new EmailHeader()).GetType());
-
 			//Adding the filename
 			emailHeader.SupplementalTextFilename = filename;
-
 			//adding the timestamp
 			emailHeader.DateAdded = DateTime.Now;
-
 			return emailHeader;
 		}
 
-		private static Emails GetEmail(string bodyPath, string filename)
-		{
-			//Read Body
-			string body  =  FileManager.FileToString(bodyPath, filename);
-
-			//Format string to JSON
-			string[] jsonHeaderArray = body.Replace("=", "\":\"").Replace("\t", "\"\t\"").Split('\t');
-
-			//JoingArray to JSON 
-			string jsonEmailHeader = String.Join(",", jsonHeaderArray);
-
-			//Conver to EmailHeaderObject
-			Emails emailHeader = (Emails)(new JavaScriptSerializer())
-										.Deserialize(jsonEmailHeader, (new EmailHeader()).GetType());
-
-
-			//adding the timestamp
-			emailHeader.DateAdded = DateTime.Now;
-
-			return emailHeader;
-		}
+		//private static Emails GetEmail(string bodyPath, string filename)
+		//{
+		//	//Read Body
+		//	string body = FileManager.FileToString(bodyPath, filename);
+		//	//Format string to JSON
+		//	string[] jsonHeaderArray = body.Replace("=", "\":\"").Replace("\t", "\"\t\"").Split('\t');
+		//	//JoingArray to JSON 
+		//	string jsonEmailHeader = String.Join(",", jsonHeaderArray);
+		//	//Conver to EmailHeaderObject
+		//	Emails emailHeader = (Emails)(new JavaScriptSerializer())
+		//								.Deserialize(jsonEmailHeader, (new EmailHeader()).GetType());
+		//	//adding the timestamp
+		//	emailHeader.DateAdded = DateTime.Now;
+		//	return emailHeader;
+		//}
 
 		public static List<string> ExtractEmails(string textToScrape)
 		{
@@ -108,7 +134,7 @@ namespace EmailManager
 			return domainList;
 		}
 
-			public static List<string> ExtractHttpDomains(string textToScrape)
+		public static List<string> ExtractHttpDomains(string textToScrape)
 		{
 			Regex reg = new Regex(@"(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?", RegexOptions.IgnoreCase);
 			Match match;
