@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="QuarksoftDBEmailsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Domains">
+          <Key>
+            <PropertyRef Name="DomainID" />
+          </Key>
+          <Property Name="DomainID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DomainName" Type="nvarchar" MaxLength="128" />
+          <Property Name="DateAdded" Type="datetime" />
+        </EntityType>
+        <EntityType Name="EmailDomains">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DomainID" Type="int" />
+          <Property Name="EmailHeaderID" Type="bigint" />
+          <Property Name="DateAdded" Type="datetime" />
+        </EntityType>
+        <EntityType Name="EmailHeader">
+          <Key>
+            <PropertyRef Name="EmailHeaderID" />
+          </Key>
+          <Property Name="EmailHeaderID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Account" Type="varchar" MaxLength="80" />
+          <Property Name="Server" Type="varchar" MaxLength="80" />
+          <Property Name="SenderEmailID" Type="int" />
+          <Property Name="TimeAcquired" Type="timestamp" StoreGeneratedPattern="Computed" Nullable="false" />
+          <Property Name="ClientIP" Type="varchar" MaxLength="64" />
+          <Property Name="AuthenticationStatus" Type="int" />
+          <Property Name="User" Type="varchar" MaxLength="80" />
+          <Property Name="Priority" Type="varchar" MaxLength="20" />
+          <Property Name="Campaign" Type="varchar" MaxLength="80" />
+          <Property Name="Status" Type="varchar" MaxLength="50" />
+          <Property Name="CommandType" Type="nvarchar" MaxLength="50" />
+          <Property Name="Subject" Type="nvarchar" MaxLength="200" />
+          <Property Name="SupplementalTextFilename" Type="varchar" MaxLength="128" />
+          <Property Name="DateAdded" Type="datetime" />
+        </EntityType>
+        <EntityType Name="EmailRecipients">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmailID" Type="int" />
+          <Property Name="EmailHeaderID" Type="bigint" />
+          <Property Name="DateAdded" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Emails">
+          <Key>
+            <PropertyRef Name="EmailID" />
+          </Key>
+          <Property Name="EmailID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="128" />
+          <Property Name="DateAdded" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_dbo_EmailDomains_dbo_Domain_DomainID">
+          <End Role="Domains" Type="Self.Domains" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="EmailDomains" Type="Self.EmailDomains" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Domains">
+              <PropertyRef Name="DomainID" />
+            </Principal>
+            <Dependent Role="EmailDomains">
+              <PropertyRef Name="DomainID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID">
+          <End Role="EmailHeader" Type="Self.EmailHeader" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="EmailDomains" Type="Self.EmailDomains" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailHeader">
+              <PropertyRef Name="EmailHeaderID" />
+            </Principal>
+            <Dependent Role="EmailDomains">
+              <PropertyRef Name="EmailHeaderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailHeader_dbo_Email_EmailID">
+          <End Role="Emails" Type="Self.Emails" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="EmailHeader" Type="Self.EmailHeader" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Emails">
+              <PropertyRef Name="EmailID" />
+            </Principal>
+            <Dependent Role="EmailHeader">
+              <PropertyRef Name="SenderEmailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailRecipients_dbo_Email_EmailID">
+          <End Role="Emails" Type="Self.Emails" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="EmailRecipients" Type="Self.EmailRecipients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Emails">
+              <PropertyRef Name="EmailID" />
+            </Principal>
+            <Dependent Role="EmailRecipients">
+              <PropertyRef Name="EmailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID">
+          <End Role="EmailHeader" Type="Self.EmailHeader" Multiplicity="0..1" />
+          <End Role="EmailRecipients" Type="Self.EmailRecipients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailHeader">
+              <PropertyRef Name="EmailHeaderID" />
+            </Principal>
+            <Dependent Role="EmailRecipients">
+              <PropertyRef Name="EmailHeaderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="QuarksoftDBEmailsModelStoreContainer">
+          <EntitySet Name="Domains" EntityType="Self.Domains" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmailDomains" EntityType="Self.EmailDomains" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmailHeader" EntityType="Self.EmailHeader" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="EmailRecipients" EntityType="Self.EmailRecipients" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Emails" EntityType="Self.Emails" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_dbo_EmailDomains_dbo_Domain_DomainID" Association="Self.FK_dbo_EmailDomains_dbo_Domain_DomainID">
+            <End Role="Domains" EntitySet="Domains" />
+            <End Role="EmailDomains" EntitySet="EmailDomains" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID" Association="Self.FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID">
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+            <End Role="EmailDomains" EntitySet="EmailDomains" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailHeader_dbo_Email_EmailID" Association="Self.FK_dbo_EmailHeader_dbo_Email_EmailID">
+            <End Role="Emails" EntitySet="Emails" />
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailRecipients_dbo_Email_EmailID" Association="Self.FK_dbo_EmailRecipients_dbo_Email_EmailID">
+            <End Role="Emails" EntitySet="Emails" />
+            <End Role="EmailRecipients" EntitySet="EmailRecipients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID" Association="Self.FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID">
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+            <End Role="EmailRecipients" EntitySet="EmailRecipients" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="QuarksoftDBEmailsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Domains">
+          <Key>
+            <PropertyRef Name="DomainID" />
+          </Key>
+          <Property Name="DomainID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DomainName" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="EmailDomains" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_Domain_DomainID" FromRole="Domains" ToRole="EmailDomains" />
+        </EntityType>
+        <EntityType Name="EmailHeader">
+          <Key>
+            <PropertyRef Name="EmailHeaderID" />
+          </Key>
+          <Property Name="EmailHeaderID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Account" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Server" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="SenderEmailID" Type="Int32" />
+          <Property Name="TimeAcquired" Type="Binary" MaxLength="8" FixedLength="true" Nullable="false" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="ClientIP" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
+          <Property Name="AuthenticationStatus" Type="Int32" />
+          <Property Name="User" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Priority" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Campaign" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CommandType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Subject" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="SupplementalTextFilename" Type="String" MaxLength="128" FixedLength="false" Unicode="false" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Emails" Relationship="Self.FK_dbo_EmailHeader_dbo_Email_EmailID" FromRole="EmailHeader" ToRole="Emails" />
+          <NavigationProperty Name="EmailDomains" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID" FromRole="EmailHeader" ToRole="EmailDomains" />
+          <NavigationProperty Name="EmailRecipients" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID" FromRole="EmailHeader" ToRole="EmailRecipients" />
+        </EntityType>
+        <EntityType Name="Emails">
+          <Key>
+            <PropertyRef Name="EmailID" />
+          </Key>
+          <Property Name="EmailID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="EmailHeader" Relationship="Self.FK_dbo_EmailHeader_dbo_Email_EmailID" FromRole="Emails" ToRole="EmailHeader" />
+          <NavigationProperty Name="EmailRecipients" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_Email_EmailID" FromRole="Emails" ToRole="EmailRecipients" />
+        </EntityType>
+        <Association Name="FK_dbo_EmailHeader_dbo_Email_EmailID">
+          <End Role="Emails" Type="Self.Emails" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="EmailHeader" Type="Self.EmailHeader" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Emails">
+              <PropertyRef Name="EmailID" />
+            </Principal>
+            <Dependent Role="EmailHeader">
+              <PropertyRef Name="SenderEmailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="QuarksoftDBEmailsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Domains" EntityType="Self.Domains" />
+          <EntitySet Name="EmailHeader" EntityType="Self.EmailHeader" />
+          <EntitySet Name="Emails" EntityType="Self.Emails" />
+          <AssociationSet Name="FK_dbo_EmailHeader_dbo_Email_EmailID" Association="Self.FK_dbo_EmailHeader_dbo_Email_EmailID">
+            <End Role="Emails" EntitySet="Emails" />
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+          </AssociationSet>
+          <EntitySet Name="EmailDomains" EntityType="QuarksoftDBEmailsModel.EmailDomains" />
+          <EntitySet Name="EmailRecipients" EntityType="QuarksoftDBEmailsModel.EmailRecipients" />
+          <AssociationSet Name="FK_dbo_EmailDomains_dbo_Domain_DomainID" Association="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_Domain_DomainID">
+            <End Role="Domains" EntitySet="Domains" />
+            <End Role="EmailDomains" EntitySet="EmailDomains" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID" Association="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID">
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+            <End Role="EmailDomains" EntitySet="EmailDomains" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID" Association="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID">
+            <End Role="EmailHeader" EntitySet="EmailHeader" />
+            <End Role="EmailRecipients" EntitySet="EmailRecipients" />
+          </AssociationSet>
+          <AssociationSet Name="FK_dbo_EmailRecipients_dbo_Email_EmailID" Association="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_Email_EmailID">
+            <End Role="Emails" EntitySet="Emails" />
+            <End Role="EmailRecipients" EntitySet="EmailRecipients" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="EmailDomains">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DomainID" Type="Int32" />
+          <Property Name="EmailHeaderID" Type="Int64" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Domains" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_Domain_DomainID" FromRole="EmailDomains" ToRole="Domains" />
+          <NavigationProperty Name="EmailHeader" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID" FromRole="EmailDomains" ToRole="EmailHeader" />
+        </EntityType>
+        <EntityType Name="EmailRecipients">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmailID" Type="Int32" />
+          <Property Name="EmailHeaderID" Type="Int64" />
+          <Property Name="DateAdded" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="EmailHeader" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID" FromRole="EmailRecipients" ToRole="EmailHeader" />
+          <NavigationProperty Name="Emails" Relationship="QuarksoftDBEmailsModel.FK_dbo_EmailRecipients_dbo_Email_EmailID" FromRole="EmailRecipients" ToRole="Emails" />
+        </EntityType>
+        <Association Name="FK_dbo_EmailDomains_dbo_Domain_DomainID">
+          <End Type="QuarksoftDBEmailsModel.Domains" Role="Domains" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="QuarksoftDBEmailsModel.EmailDomains" Role="EmailDomains" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Domains">
+              <PropertyRef Name="DomainID" />
+            </Principal>
+            <Dependent Role="EmailDomains">
+              <PropertyRef Name="DomainID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailDomains_dbo_EmailHeader_EmailHeaderID">
+          <End Type="QuarksoftDBEmailsModel.EmailHeader" Role="EmailHeader" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="QuarksoftDBEmailsModel.EmailDomains" Role="EmailDomains" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailHeader">
+              <PropertyRef Name="EmailHeaderID" />
+            </Principal>
+            <Dependent Role="EmailDomains">
+              <PropertyRef Name="EmailHeaderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailRecipients_dbo_EmailHeader_EmailHeaderID">
+          <End Type="QuarksoftDBEmailsModel.EmailHeader" Role="EmailHeader" Multiplicity="0..1" />
+          <End Type="QuarksoftDBEmailsModel.EmailRecipients" Role="EmailRecipients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="EmailHeader">
+              <PropertyRef Name="EmailHeaderID" />
+            </Principal>
+            <Dependent Role="EmailRecipients">
+              <PropertyRef Name="EmailHeaderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_dbo_EmailRecipients_dbo_Email_EmailID">
+          <End Type="QuarksoftDBEmailsModel.Emails" Role="Emails" Multiplicity="0..1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="QuarksoftDBEmailsModel.EmailRecipients" Role="EmailRecipients" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Emails">
+              <PropertyRef Name="EmailID" />
+            </Principal>
+            <Dependent Role="EmailRecipients">
+              <PropertyRef Name="EmailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="QuarksoftDBEmailsModelStoreContainer" CdmEntityContainer="QuarksoftDBEmailsEntities">
+          <EntitySetMapping Name="Domains">
+            <EntityTypeMapping TypeName="QuarksoftDBEmailsModel.Domains">
+              <MappingFragment StoreEntitySet="Domains">
+                <ScalarProperty Name="DomainID" ColumnName="DomainID" />
+                <ScalarProperty Name="DomainName" ColumnName="DomainName" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmailHeader">
+            <EntityTypeMapping TypeName="QuarksoftDBEmailsModel.EmailHeader">
+              <MappingFragment StoreEntitySet="EmailHeader">
+                <ScalarProperty Name="EmailHeaderID" ColumnName="EmailHeaderID" />
+                <ScalarProperty Name="Account" ColumnName="Account" />
+                <ScalarProperty Name="Server" ColumnName="Server" />
+                <ScalarProperty Name="SenderEmailID" ColumnName="SenderEmailID" />
+                <ScalarProperty Name="TimeAcquired" ColumnName="TimeAcquired" />
+                <ScalarProperty Name="ClientIP" ColumnName="ClientIP" />
+                <ScalarProperty Name="AuthenticationStatus" ColumnName="AuthenticationStatus" />
+                <ScalarProperty Name="User" ColumnName="User" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+                <ScalarProperty Name="Campaign" ColumnName="Campaign" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="CommandType" ColumnName="CommandType" />
+                <ScalarProperty Name="Subject" ColumnName="Subject" />
+                <ScalarProperty Name="SupplementalTextFilename" ColumnName="SupplementalTextFilename" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Emails">
+            <EntityTypeMapping TypeName="QuarksoftDBEmailsModel.Emails">
+              <MappingFragment StoreEntitySet="Emails">
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmailDomains">
+            <EntityTypeMapping TypeName="QuarksoftDBEmailsModel.EmailDomains">
+              <MappingFragment StoreEntitySet="EmailDomains">
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="EmailHeaderID" ColumnName="EmailHeaderID" />
+                <ScalarProperty Name="DomainID" ColumnName="DomainID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="EmailRecipients">
+            <EntityTypeMapping TypeName="QuarksoftDBEmailsModel.EmailRecipients">
+              <MappingFragment StoreEntitySet="EmailRecipients">
+                <ScalarProperty Name="DateAdded" ColumnName="DateAdded" />
+                <ScalarProperty Name="EmailHeaderID" ColumnName="EmailHeaderID" />
+                <ScalarProperty Name="EmailID" ColumnName="EmailID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
