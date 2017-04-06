@@ -11,7 +11,9 @@ namespace MainConsole
 	{
 		static void Main(string[] args)
 		{
-			EmailProcessor.ProcessEmail("samplefile");
+			EmailProcessor.ProcessEmail(@"C:\Users\simlog\Desktop\MailWrapper\EmailSampleFiles\cmd"
+									  , @"C:\Users\simlog\Desktop\MailWrapper\EmailSampleFiles\msg"
+									  ,"00D1810DA720471C9D89262EF55F23A6.MAI");
 		}
 	}
 }
