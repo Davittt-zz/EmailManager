@@ -5,7 +5,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="265d52b1d2f042b892291d33c31a2ee4" Name="Diagram1">
-        <EntityTypeShape EntityType="QuarksoftDBEmailsModel.Domains" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QuarksoftDBEmailsModel.Domains" Width="1.5" PointX="5.75" PointY="0.5" IsExpanded="true" />
         <EntityTypeShape EntityType="QuarksoftDBEmailsModel.EmailHeader" Width="1.5" PointX="3.25" PointY="0.5" IsExpanded="true" />
         <EntityTypeShape EntityType="QuarksoftDBEmailsModel.Emails" Width="1.5" PointX="0.75" PointY="1" IsExpanded="true" />
         <AssociationConnector Association="QuarksoftDBEmailsModel.FK_dbo_EmailHeader_dbo_Email_EmailID" ManuallyRouted="false" />

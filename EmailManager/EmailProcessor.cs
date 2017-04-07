@@ -13,31 +13,135 @@ namespace EmailManager
 	{
 		public static bool ProcessEmail(string headerPath, string bodyPath, string filename)
 		{
-			EmailHeader emailHeader = GetHeader(headerPath, filename);
+			try
+			{
+				var headerString = FileManager.FileToString(headerPath, filename);
+				var bodyString = FileManager.FileToString(bodyPath, filename);
 
-			var headerString = FileManager.FileToString(headerPath, filename);
-			var bodyString = FileManager.FileToString(bodyPath, filename);
-			
-			List<string> OverallEmailList = GetAllEmails(headerString, bodyString);
+				List<string> OverallEmailList = GetAllEmails(headerString, bodyString);
 
-			List<string> OverallDomainList = GetAllDomains(headerString, bodyString);
+				List<string> OverallDomainList = GetAllDomains(headerString, bodyString);
 
-			//Find EmailID or creat new elements
-			List<int> EmailIDList = UpdateEmailTable(OverallEmailList);
+				//Find EmailID or creat new elements
+				List<int> EmailIDList = UpdateEmailTable(OverallEmailList);
 
-			//Find DomainID or creat new elements
-			List<int> DomainIDList = UpdateDomainTable(OverallDomainList);
-			return false;
+				//Find DomainID or creat new elements
+				List<int> DomainIDList = UpdateDomainTable(OverallDomainList);
+
+				EmailHeader emailHeader = GetHeader(headerPath, filename);
+				long HeaderID = SaveEmailHeader(emailHeader);
+
+				SaveEmailDomains(HeaderID, DomainIDList);
+
+				SaveEmailRecipients(HeaderID, EmailIDList);
+
+				return true;
+			}
+			catch (Exception Ex) {
+				Console.WriteLine("Something wrong with the email: " + filename);
+				return false;
+			}
 		}
 
-		private static List<int> UpdateEmailTable(List<string> overallEmailList)
+		private static void SaveEmailRecipients(long headerID, List<int> emailIDList)
 		{
-			throw new NotImplementedException();
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				foreach (int emailID in emailIDList)
+				{
+					database.EmailRecipients.Add(new EmailRecipients() { EmailHeaderID = headerID, EmailID = emailID,DateAdded=DateTime.Now});
+				}
+				database.SaveChanges();
+			}
+		}
+
+		private static void SaveEmailDomains(long headerID, List<int> domainIDList)
+		{
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				foreach (int domainID in domainIDList)
+				{
+					database.EmailDomains.Add( new EmailDomains() { EmailHeaderID = headerID, DomainID = domainID, DateAdded = DateTime.Now });
+				}
+				database.SaveChanges();
+			}
+		}
+
+		private static long SaveEmailHeader(EmailHeader emailHeader)
+		{
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				emailHeader.SenderEmailID = GetEmailID(ExtractEmails(emailHeader.Sender).First());
+				//adding the timestamp
+				emailHeader.DateAdded = DateTime.Now;
+
+				database.EmailHeader.Add(emailHeader);
+				database.SaveChanges();
+				return emailHeader.EmailHeaderID;
+			}
+		}
+
+		private static int? GetEmailID(string emailName)
+		{
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				var Email = database.Emails.FirstOrDefault(x => x.Email.Equals(emailName));
+				return (Email != null) ? Email.EmailID : -1;
+			}
+		}
+
+		private static List<int> UpdateEmailTable(List<string> OverallEmailList)
+		{
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				List<int> emailIDList = new List<int>();
+
+				foreach (string emailItem in OverallEmailList)
+				{
+					var foundEmail = database.Emails.FirstOrDefault(x => x.Email.Equals(emailItem));
+					if (foundEmail != null)
+					{
+						emailIDList.Add(foundEmail.EmailID);
+					}
+					else
+					{
+						//Add a New email
+						Emails newEmail = new Emails() { Email = emailItem, DateAdded = DateTime.Now };
+						database.Emails.Add(newEmail);
+						database.SaveChanges();
+						//Add new EmailID
+						emailIDList.Add(newEmail.EmailID);
+					}
+				}
+				return emailIDList;
+			}
 		}
 
 		private static List<int> UpdateDomainTable(List<string> OverallDomainList)
 		{
-			throw new NotImplementedException();
+			using (QuarksoftDBEmailsEntities database = new QuarksoftDBEmailsEntities())
+			{
+				List<int> emailIDList = new List<int>();
+
+				foreach (string domainItem in OverallDomainList)
+				{
+					var foundDomain = database.Domains.FirstOrDefault(x => x.DomainName.Equals(domainItem));
+					if (foundDomain != null)
+					{
+						emailIDList.Add(foundDomain.DomainID);
+					}
+					else
+					{
+						//Add a New Domain
+						Domains newDomain = new Domains() { DomainName = domainItem, DateAdded = DateTime.Now };
+						database.Domains.Add(newDomain);
+						database.SaveChanges();
+						//Add new DomainID
+						emailIDList.Add(newDomain.DomainID);
+					}
+				}
+				return emailIDList;
+			}
 		}
 
 		private static List<string> GetAllDomains(string headerString, string bodyString)
@@ -76,7 +180,7 @@ namespace EmailManager
 			string header = "{\"" + FileManager.FileToString(headerPath, filename) + "\"}";
 
 			//Format string to JSON
-			string[] jsonHeaderArray = header.Replace("=", "\":\"").Replace("\t", "\"\t\"").Split('\t');
+			string[] jsonHeaderArray = header.Replace("#EQUAL#", "\":\"").Replace("\t", "\"\t\"").Split('\t');
 
 			//JoingArray to JSON 
 			string jsonEmailHeader = String.Join(",", jsonHeaderArray);
@@ -86,26 +190,8 @@ namespace EmailManager
 													.Deserialize(jsonEmailHeader, (new EmailHeader()).GetType());
 			//Adding the filename
 			emailHeader.SupplementalTextFilename = filename;
-			//adding the timestamp
-			emailHeader.DateAdded = DateTime.Now;
 			return emailHeader;
 		}
-
-		//private static Emails GetEmail(string bodyPath, string filename)
-		//{
-		//	//Read Body
-		//	string body = FileManager.FileToString(bodyPath, filename);
-		//	//Format string to JSON
-		//	string[] jsonHeaderArray = body.Replace("=", "\":\"").Replace("\t", "\"\t\"").Split('\t');
-		//	//JoingArray to JSON 
-		//	string jsonEmailHeader = String.Join(",", jsonHeaderArray);
-		//	//Conver to EmailHeaderObject
-		//	Emails emailHeader = (Emails)(new JavaScriptSerializer())
-		//								.Deserialize(jsonEmailHeader, (new EmailHeader()).GetType());
-		//	//adding the timestamp
-		//	emailHeader.DateAdded = DateTime.Now;
-		//	return emailHeader;
-		//}
 
 		public static List<string> ExtractEmails(string textToScrape)
 		{
