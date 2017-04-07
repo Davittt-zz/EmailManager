@@ -9,11 +9,10 @@
 
 namespace EmailManager
 {
-	using System;
-	using System.Collections.Generic;
-	using System.ComponentModel.DataAnnotations.Schema;
-
-	public partial class EmailHeader
+    using System;
+    using System.Collections.Generic;
+    
+    public partial class EmailHeader
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public EmailHeader()
@@ -43,9 +42,5 @@ namespace EmailManager
         public virtual ICollection<EmailDomains> EmailDomains { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EmailRecipients> EmailRecipients { get; set; }
-		[NotMapped]
-		public string Recipients { get; set; }
-		[NotMapped]
-		public string Sender { get; set; }
-	}
+    }
 }

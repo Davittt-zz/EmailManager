@@ -85,6 +85,7 @@
       <DependentUpon>EmailManagerModel.tt</DependentUpon>
     </Compile>
     <Compile Include="FileManager.cs" />
+    <Compile Include="PartialEmailHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
